@@ -24,7 +24,7 @@ import TextRecognition, {
 } from '@react-native-ml-kit/text-recognition';
 
 // [중요] data.go.kr에서 발급받은 본인의 서비스 키(URL 인코딩된 버전)를 입력하세요.
-const API_SERVICE_KEY = 'YOUR6cc28f6d1e890033344389f0ece41fa143c9a78bd24ab2a29ae101baadf0aefe_PUBLIC_DATA_PORTAL_SERVICE_KEY';
+const API_SERVICE_KEY = '6cc28f6d1e890033344389f0ece41fa143c9a78bd24ab2a29ae101baadf0aefe';
 // 'e약은요' 서비스 API 엔드포인트
 const API_ENDPOINT =
   'http://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList';
@@ -72,23 +72,41 @@ const App = () => {
     if (!imageUri) return;
     setIsLoading(true);
     try {
-      // ML Kit 결과의 타입을 TextRecognitionResult로 지정
-      const result: TextRecognitionResult = await TextRecognition.recognize(
-        imageUri,
-      );
+      const result: TextRecognitionResult = await TextRecognition.recognize(imageUri);
+      
+      // 1. OCR 결과에서 모든 텍스트 라인을 합칩니다.
+      const allLines = result.blocks.flatMap(block => block.lines.map(line => line.text));
+      
+      // 2. "정", "캡슐", "시럽" 등으로 끝나는 단어(약물 이름 후보)를 찾습니다.
+      const drugNameCandidates = new Set<string>(); // 중복 제거
+      const drugSuffixes = ['정', '캡슐', '시럽', '연고', '장용정'];
+      
+      allLines.forEach(line => {
+        const words = line.split(' ');
+        words.forEach(word => {
+          // (정제된 단어가 2글자 이상이고, 약물 접미사로 끝나는 경우)
+          const cleanWord = word.replace(/[^가-힣0-9a-zA-Z]/g, ''); // 특수문자 제거
+          if (cleanWord.length > 1 && drugSuffixes.some(suffix => cleanWord.endsWith(suffix))) {
+            drugNameCandidates.add(cleanWord);
+          }
+        });
+      });
 
-      if (result.blocks.length > 0) {
-        const firstWord = result.blocks[0]?.lines[0]?.text.split(' ')[0];
-
-        if (firstWord) {
-          Alert.alert('OCR 인식 완료', `인식된 검색어: ${firstWord}`);
-          setSearchQuery(firstWord);
-          await searchDrugApi(firstWord);
-        } else {
-          Alert.alert('OCR 실패', '텍스트를 인식하지 못했습니다.');
-        }
+      if (drugNameCandidates.size > 0) {
+        const firstCandidate = Array.from(drugNameCandidates)[0];
+        Alert.alert(
+          'OCR 인식 완료',
+          `찾은 약물 후보: ${firstCandidate} 등 ${drugNameCandidates.size}건`,
+        );
+        
+        // [수정] 현재 앱 로직은 한 번에 하나의 약물만 보여주므로, 
+        // 여기서는 첫 번째 후보로 검색을 시도합니다.
+        // (나중에 여러 결과를 동시에 보여주도록 수정할 수 있습니다.)
+        setSearchQuery(firstCandidate);
+        await searchDrugApi(firstCandidate); 
+        
       } else {
-        Alert.alert('OCR 실패', '텍스트를 찾지 못했습니다.');
+        Alert.alert('OCR 실패', '약물 이름으로 의심되는 텍스트를 찾지 못했습니다.');
       }
     } catch (error) {
       console.error('OCR Error:', error);
