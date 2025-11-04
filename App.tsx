@@ -10,6 +10,8 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  KeyboardAvoidingView, // 1. KeyboardAvoidingView 임포트
+  Platform,             // 2. Platform 임포트
 } from 'react-native';
 // ImagePicker와 MLKit에서 타입(Type)들도 함께 import 합니다.
 import {
@@ -246,39 +248,49 @@ const App = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>약물 정보 프로토타입</Text>
+      {/* 3. KeyboardAvoidingView로 감싸기 */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{flex: 1}} // 4. flex: 1 적용
+      >
+        <Text style={styles.title}>약물 정보 프로토타입</Text>
+
+        <View style={styles.buttonContainer}>
+          <Button
+            title="1. 갤러리에서 처방전 인식"
+            onPress={handleGalleryOCR}
+            disabled={isLoading}
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <Button
+            title="2. 카메라로 처방전 촬영"
+            onPress={handleCameraOCR}
+            disabled={isLoading}
+          />
+        </View>
+        <Text style={styles.label}>3. 약물 이름으로 직접 검색</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="예) 한미아스피린장용정"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <Button
+          title="검색 실행"
+          onPress={handleTextSearch}
+          disabled={isLoading}
+        />
+      </KeyboardAvoidingView>
+      
+      {/* 로딩 오버레이는 KeyboardAvoidingView 밖에 두어 전체 화면을 덮도록 함 */}
       {isLoading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#0000ff" />
           <Text>처리 중...</Text>
         </View>
       )}
-      <View style={styles.buttonContainer}>
-        <Button
-          title="1. 갤러리에서 처방전 인식"
-          onPress={handleGalleryOCR}
-          disabled={isLoading}
-        />
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button
-          title="2. 카메라로 처방전 촬영"
-          onPress={handleCameraOCR}
-          disabled={isLoading}
-        />
-      </View>
-      <Text style={styles.label}>3. 약물 이름으로 직접 검색</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="예) 한미아스피린장용정"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
-      <Button
-        title="검색 실행"
-        onPress={handleTextSearch}
-        disabled={isLoading}
-      />
+
       {renderDrugInfoModal()}
     </SafeAreaView>
   );
@@ -289,13 +301,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    justifyContent: 'center',
+    // justifyContent: 'center', // 5. 이 줄을 삭제하거나 주석 처리합니다.
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 30,
+    marginTop: 20, // 6. 상단 여백 추가
   },
   buttonContainer: {
     marginVertical: 10,
