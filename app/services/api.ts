@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 
-const BASE_URL = 'http://223.130.158.111:8080/api' 
+const BASE_URL = 'http://192.168.123.100:8088/api' 
 
 // 일정/루틴 타입 정의
 export interface Schedule {

@@ -386,6 +386,36 @@ const HomeScreen = () => {
         </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* 하단 광고 배너 */}
+      <TouchableOpacity style={styles.bottomBanner} onPress={() => {}}>
+        <View style={styles.bannerBadge}><Text style={styles.bannerBadgeText}>AD</Text></View>
+        <Text style={styles.bannerTitle}>힘쑥쑥 영양제</Text>
+        <Text style={styles.bannerDesc} numberOfLines={1}>피곤한 오늘! 오메가 3로 지치지 않는 힘을...</Text>
+      </TouchableOpacity>
+
+      {/* 하단 탭 바 - HomeScreen에 직접 추가 */}
+      <View style={styles.bottomTab}>
+        <TouchableOpacity style={styles.tabItem} onPress={() => {}}>
+          <Image source={require("../../../assets/house.png")} style={styles.tabIcon} resizeMode="contain" />
+          <Text style={[styles.tabText, { color: '#08504a', fontWeight: 'bold' }]}>피드</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.tabItem} onPress={() => {}}>
+          <Image source={require("../../../assets/list.bullet.clipboard.png")} style={styles.tabIcon} resizeMode="contain" />
+          <Text style={styles.tabText}>리포트</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.tabItem} onPress={() => {}}>
+          <Image source={require("../../../assets/medal.png")} style={styles.tabIcon} resizeMode="contain" />
+          <Text style={styles.tabText}>리워드</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.tabItem} onPress={() => {}}>
+          <Image source={require("../../../assets/person.png")} style={styles.tabIcon} resizeMode="contain" />
+          <Text style={styles.tabText}>프로필</Text>
+        </TouchableOpacity>
+      </View>
     </ScreenLayout>
 
     {/* 루틴 메뉴 모달 */}
@@ -496,6 +526,8 @@ const HomeScreen = () => {
         setSelectedSchedule(null);
       }}
     />
+
+    
     </>
   );
 };
@@ -557,7 +589,7 @@ const styles = StyleSheet.create({
   bannerBadgeText: { fontSize: wp(9), color: '#08504a', fontWeight: '700' },
   bannerTitle: { fontSize: wp(12), fontWeight: '700', color: '#333', marginRight: wp(5) },
   bannerDesc: { fontSize: wp(12), color: '#989898', flex: 1 },
-  bottomTab: { flexDirection: 'row', justifyContent: 'space-around', paddingVertical: wp(10), borderTopWidth: 1, borderTopColor: '#f0f0f0', paddingBottom: wp(10) },
+  bottomTab: { flexDirection: 'row', justifyContent: 'space-around', paddingTop: wp(10), paddingBottom: wp(60), borderTopWidth: 1, borderTopColor: '#f0f0f0', backgroundColor: '#fff' },
   tabItem: { alignItems: 'center', justifyContent: 'center' },
   tabIcon: { width: wp(24), height: wp(24), marginBottom: wp(4) },
   tabText: { fontSize: wp(10), color: '#999', fontFamily: 'SUIT' },
